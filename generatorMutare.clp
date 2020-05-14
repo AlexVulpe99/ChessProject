@@ -1,10 +1,17 @@
-(deffacts fapte
-     (piesa B d 4)
-     (white f 6)
-     (white b 6)
-     (white b 2)
-     (white f 2)
-)
+;(deffacts fapte
+;     (piesa N c 3)
+;     (white c 3)
+;     (black f 6)
+;     (black e 3)
+;     (black c 3)
+;     (black c 5)
+;     (piesa R d 4)
+;     (white d 5)
+;     (black d 6)
+;     (black d 3)
+;     (black c 4)
+;     (black e 4)
+;)
 
 ;Regula pentru aflarea liniei si a coloanei
 (defrule LinieSiColoana
@@ -164,8 +171,10 @@
      ?r <- (piesa P ? ?)
      (coloana ?c)
      (linia ?l)
+     ?w <- (whitec ?c ?l)
      =>
      (retract ?r)
+     (retract ?w)
      (assert (pion 1))
      (if (= ?l 2) ;daca pionul este pe linia 2, el poate face 2 mutari
      then
@@ -175,7 +184,6 @@
           (assert (mutarePosibila ?c (+ ?l 1)))
      )
 )
-
 
 (defrule Pion2
      (pion ?)
@@ -199,7 +207,9 @@
      ?r <- (piesa R ? ?)
      (coloana ?c)
      (linia ?l)
+     ?w <- (whitec ?c ?l)
      =>
+     (retract ?w)
      (retract ?r)
      (assert (rook 1))
 )
@@ -283,6 +293,58 @@
      )
 )
 
+(defrule Rook7 ; pentru Est
+     (rook ?)
+     (coloana ?c)
+     (linia ?l)
+     ?r <- (mutarePosibila ?mc ?l)
+     (blackc ?wc ?l)
+     =>
+     (
+          if (and (> ?mc ?wc) (> ?wc ?c))
+          then (retract ?r)
+     )
+)
+
+(defrule Rook8 ; pentru Vest
+     (rook ?)
+     (coloana ?c)
+     (linia ?l)
+     ?r <- (mutarePosibila ?mc ?l)
+     (blackc ?wc ?l)
+     =>
+     (
+          if (and (< ?mc ?wc) (< ?wc ?c))
+          then (retract ?r)
+     )
+)
+
+(defrule Rook9 ; pentru Nord
+     (rook ?)
+     (coloana ?c)
+     (linia ?l)
+     ?r <- (mutarePosibila ?c ?ml)
+     (blackc ?c ?wl)
+     =>
+     (
+          if (and (> ?ml ?wl) (> ?wl ?l))
+          then (retract ?r)
+     )
+)
+
+(defrule Rook10 ; pentru Sud
+     (rook ?)
+     (coloana ?c)
+     (linia ?l)
+     ?r <- (mutarePosibila ?c ?ml)
+     (blackc ?c ?wl)
+     =>
+     (
+          if (and (< ?ml ?wl) (< ?wl ?l))
+          then (retract ?r)
+     )
+)
+
 
 
 ;reguli pentru Bishop
@@ -290,7 +352,9 @@
      ?r <- (piesa B ? ?)
      (coloana ?c)
      (linia ?l)
+     ?w <- (whitec ?c ?l)
      =>
+     (retract ?w)
      (retract ?r)
      (assert (bishop 1))
 )
@@ -299,7 +363,51 @@
      (bishop ?)
      (linia ?l)
      (coloana ?c)
-     ?r <- (whitec ?wc ?wl)
+     (whitec ?wc ?wl)
+     (blackc ?bc ?bl)
+     =>
+     (bind ?a ?c)
+     (bind ?b ?l)
+     ;primul cadran , linie + 1, coloana + 1
+     (while (and (and (< ?a 8) (< ?b 8)) (and (and (< ?a ?bc) (< ?b ?bl)) (and (<> ?a ?wc) (<> ?b ?wl)) ))
+          (bind ?a (+ ?a 1))
+          (bind ?b (+ ?b 1))
+          (assert (mutarePosibila ?a ?b))
+     )
+    
+     (bind ?a ?c)
+     (bind ?b ?l)
+     ;al doilea cadran, linie + 1, coloana - 1
+     (while (and (and (> ?a 1) (< ?b 8)) (and (> ?a ?wc) (< ?b ?wl)))
+          (bind ?a (- ?a 1))
+          (bind ?b (+ ?b 1))
+          (assert (mutarePosibila ?a ?b))
+     )
+     
+     (bind ?a ?c)
+     (bind ?b ?l)
+     ;al treilea cadran, linie - 1, coloana - 1
+     (while (and (and (> ?a 1) (> ?b 1)) (and (> ?a ?wc) (> ?b ?wl)))
+          (bind ?a (- ?a 1))
+          (bind ?b (- ?b 1))
+          (assert (mutarePosibila ?a ?b))
+     )
+     
+     (bind ?a ?c)
+     (bind ?b ?l)
+     ;al patrulea cadran, linie - 1, coloana + 1
+     (while (and (and (< ?a 8) (> ?b 1)) (and (< ?a ?wc) (> ?b ?wl)))
+          (bind ?a (+ ?a 1))
+          (bind ?b (- ?b 1))
+          (assert (mutarePosibila ?a ?b))
+     )
+)
+
+(defrule Bishop3
+     (bishop ?)
+     (linia ?l)
+     (coloana ?c)
+     ?r <- (blackc ?wc ?wl)
      =>
      (bind ?a ?c)
      (bind ?b ?l)
@@ -339,13 +447,14 @@
 )
 
 
-
 ;reguli pentru Knight
 (defrule Knight1
      ?r <- (piesa N ? ?)
      (coloana ?c)
      (linia ?l)
+     ?w <- (whitec ?c ?l)
      =>
+     (retract ?w)
      (retract ?r)
      (assert (knight 1))
 )
@@ -357,38 +466,38 @@
      =>
      ;cadran 1 : coloana + 2, linia + 1 ; coloana + 1, linia + 2
      (
-          if (and (> 8 (+ ?c 2)) (> 8 (+ ?l 1)) )
+          if (and (>= 8 (+ ?c 2)) (>= 8 (+ ?l 1)) )
           then (assert (mutarePosibila (+ ?c 2) (+ ?l 1)))
      )
      (
-          if (and (> 8 (+ ?c 1)) (> 8 (+ ?l 2)) )
+          if (and (>= 8 (+ ?c 1)) (>= 8 (+ ?l 2)) )
           then (assert (mutarePosibila (+ ?c 1) (+ ?l 2)))
      )
      ;cadran 2 : coloana - 2, linia + 1 ; coloana - 1, linia + 2
      (
-          if (and (< 1 (- ?c 2)) (> 8 (+ ?l 1)) )
+          if (and (<= 1 (- ?c 2)) (>= 8 (+ ?l 1)) )
           then (assert (mutarePosibila (- ?c 2) (+ ?l 1)))
      )
      (
-          if (and (< 1 (- ?c 1)) (> 8 (+ ?l 2)) )
+          if (and (<= 1 (- ?c 1)) (>= 8 (+ ?l 2)) )
           then (assert (mutarePosibila (- ?c 1) (+ ?l 2)))
      )
      ;cadran 3 : coloana - 2, linia - 1 ; coloana - 1, linia - 2
      (
-          if (and (< 1 (- ?c 2)) (< 1 (- ?l 1)) )
+          if (and (<= 1 (- ?c 2)) (<= 1 (- ?l 1)) )
           then (assert (mutarePosibila (- ?c 2) (- ?l 1)))
      )
      (
-          if (and (< 1 (- ?c 1)) (< 1 (- ?l 2)) )
+          if (and (<= 1 (- ?c 1)) (<= 1 (- ?l 2)) )
           then (assert (mutarePosibila (- ?c 1) (- ?l 2)))
      )
      ;cadran 4 : coloana + 2, linia - 1 ; coloana + 1, linia - 2
      (
-          if (and (> 8 (+ ?c 2)) (< 1 (- ?l 1)) )
+          if (and (>= 8 (+ ?c 2)) (<= 1 (- ?l 1)) )
           then (assert (mutarePosibila (+ ?c 2) (- ?l 1)))
      )
      (
-          if (and (> 8 (+ ?c 1)) (< 1 (- ?l 2)) )
+          if (and (>= 8 (+ ?c 1)) (<= 1 (- ?l 2)) )
           then (assert (mutarePosibila (+ ?c 1) (- ?l 2)))
      )
 
@@ -401,7 +510,9 @@
      ?r <- (piesa Q ? ?)
      (coloana ?c)
      (linia ?l)
+     ?w <- (whitec ?c ?l)
      =>
+     (retract ?w)
      (retract ?r)
      (assert (queen 1))
      (assert (bishop 1))
@@ -414,7 +525,9 @@
      ?r <- (piesa K ? ?)
      (coloana ?c)
      (linia ?l)
+     ?w <- (whitec ?c ?l)
      =>
+     (retract ?w)
      (retract ?r)
      (assert (king 1))
 )
@@ -474,9 +587,6 @@
      =>
      (retract ?r)
 )
-
-
-;reguli pentru piese negre
 
 
 

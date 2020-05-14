@@ -1,30 +1,6 @@
-""" import os
-import clips
-
-env = clips.Environment()
-
-env.clear()
-env.load('lab2.clp')
-env.reset()
-#env.run()
-env.assert_string("(pdnp y)")
-env.assert_string("(rlf n)")
-env.assert_string("(punrec y)")
-
-env.run()
-
-
-for fact in env.facts():
-    print(fact) """
-
-
-""" mutare = 'Qe3+'
-
-mutare = mutare[0] + mutare[1] + mutare[2]
-
-print(mutare) """
-
 import tkinter as tk
+
+
 class GameBoard(tk.Frame):
     def __init__(self, parent, rows=8, columns=8, size=32, color1="white", color2="brown"):
         '''size is the size of a square, in pixels'''
@@ -83,7 +59,7 @@ class GameBoard(tk.Frame):
 
 
 
-if __name__ == "__main__":
+""" if __name__ == "__main__":
     root = tk.Tk()
     board = GameBoard(root)
     board.pack(side="top", fill="both", expand="true", padx=4, pady=4)
@@ -91,4 +67,4 @@ if __name__ == "__main__":
     #board.addpiece("player1", player1, 0,0)
     piece = tk.PhotoImage(file="./black/n32.png")
     board.addpiece("player1", piece, 0,0)
-    root.mainloop()
+    root.mainloop() """

@@ -1,16 +1,4 @@
-import os
-import clips
-
-game_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "game.txt"))
-
-with open(game_file, "r") as f:
-    game_string = f.read()
-
-moves_list = game_string.split(' ')
-moves_list = [x for x in moves_list if x != '' and '\n' not in x]
-
 #Avem lista cu mutarile executate de la inceputul partidei
-#print(moves_list)
 """
 8   r   n   b   q   k   b   n   r
 7   p   p   p   p   p   p   p   p       BLACK - litere mici
@@ -48,7 +36,7 @@ map_from_number_to_char = {
     7 : "h"
 }
 
-lista_caractere_posibile_mutare = ['a','b','c','d','e','f','g','h','r','n','k','q','O','-','x','+','#','1','2','3','4','5','6','7','8']
+lista_caractere_posibile_mutare = ['a','b','c','d','e','f','g','h','r','n','k','q','O','-','x','+','#','0','1','2','3','4','5','6','7','8']
 
 class Game:
 
@@ -530,13 +518,3 @@ class Game:
             self.afisare_board()
                 
                 
-
-
-game = Game()
-game.afisare_board()
-if game.verificare_lista_mutari(moves_list) is False:
-    print("Lista mutari contine caractere invalide")
-    print("Introduceti mutari valide in fisier")
-else:
-    game.parsare_executare_mutari(moves_list)
-
