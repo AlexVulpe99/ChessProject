@@ -202,6 +202,7 @@
 )
 
 
+
 ;Reguli pentru Rook
 (defrule Rook1
      ?r <- (piesa R ? ?)
@@ -249,7 +250,7 @@
      (whitec ?wc ?l)
      =>
      (
-          if (and (> ?mc ?wc) (> ?wc ?c))
+          if (and (>= ?mc ?wc) (> ?wc ?c))
           then (retract ?r)
      )
 )
@@ -262,7 +263,7 @@
      (whitec ?wc ?l)
      =>
      (
-          if (and (< ?mc ?wc) (< ?wc ?c))
+          if (and (<= ?mc ?wc) (< ?wc ?c))
           then (retract ?r)
      )
 )
@@ -275,7 +276,7 @@
      (whitec ?c ?wl)
      =>
      (
-          if (and (> ?ml ?wl) (> ?wl ?l))
+          if (and (>= ?ml ?wl) (> ?wl ?l))
           then (retract ?r)
      )
 )
@@ -288,7 +289,7 @@
      (whitec ?c ?wl)
      =>
      (
-          if (and (< ?ml ?wl) (< ?wl ?l))
+          if (and (<= ?ml ?wl) (< ?wl ?l))
           then (retract ?r)
      )
 )
@@ -369,7 +370,7 @@
      (bind ?a ?c)
      (bind ?b ?l)
      ;primul cadran , linie + 1, coloana + 1
-     (while (and (and (< ?a 8) (< ?b 8)) (and (and (< ?a ?bc) (< ?b ?bl)) (and (<> ?a ?wc) (<> ?b ?wl)) ))
+     (while (and (and (< ?a 8) (< ?b 8)) (and (< ?a ?wc) (< ?b ?wl)) )
           (bind ?a (+ ?a 1))
           (bind ?b (+ ?b 1))
           (assert (mutarePosibila ?a ?b))
@@ -539,108 +540,53 @@
      =>
      ;Nord -> coloana , linia + 1
      (
-          if (> 8 (+ ?l 1)) 
+          if (>= 8 (+ ?l 1)) 
           then (assert (mutarePosibila ?c (+ ?l 1)))
      )
      ;Nord-Est -> coloana + 1, linia + 1
      (
-          if (and (> 8 (+ ?c 1)) (> 8 (+ ?l 1)) )
+          if (and (>= 8 (+ ?c 1)) (>= 8 (+ ?l 1)) )
           then (assert (mutarePosibila (+ ?c 1) (+ ?l 1)))
      )
      ;Est -> coloana + 1, linia
      (
-          if  (> 8 (+ ?c 1))
+          if  (>= 8 (+ ?c 1))
           then (assert (mutarePosibila (+ ?c 1) ?l))
      )
      ;Sud-Est -> coloana + 1, linia - 1
      (
-          if (and (> 8 (+ ?c 1)) (< 1 (- ?l 1)) )
+          if (and (>= 8 (+ ?c 1)) (<= 1 (- ?l 1)) )
           then (assert (mutarePosibila (+ ?c 1) (- ?l 1)))
      )
      ;Sud -> coloana , linia - 1
      (
-          if  (< 1 (- ?l 1)) 
+          if  (<= 1 (- ?l 1)) 
           then (assert (mutarePosibila ?c (- ?l 1)))
      )
      ;Sud-Vest -> coloana - 1, linia - 1
      (
-          if (and (< 1 (- ?c 1)) (< 1 (- ?l 1)) )
+          if (and (<= 1 (- ?c 1)) (<= 1 (- ?l 1)) )
           then (assert (mutarePosibila (- ?c 1) (- ?l 1)))
      )
      ;Vest -> coloana - 1, linia
      (
-          if (< 1 (- ?c 1)) 
+          if (<= 1 (- ?c 1)) 
           then (assert (mutarePosibila (- ?c 1) ?l))
      )
      ;Nord-Vest -> coloana - 1, linia + 1
      (
-          if (and (< 1 (- ?c 1)) (> 8 (+ ?l 1)) )
+          if (and (<= 1 (- ?c 1)) (>= 8 (+ ?l 1)) )
           then (assert (mutarePosibila (- ?c 1) (+ ?l 1)))
      )
-
 )
 
 ;reguli pentru piese albe aflate pe o mutare posibila
 (defrule WhiteMutarePosibila1
-     ?r <- (mutarePosibila ?c ?l)
      (whitec ?c ?l)
+     ?r <- (mutarePosibila ?c ?l)
      =>
      (retract ?r)
 )
 
 
 
-;regula pentru transformare coloana int -> string
-(defrule ColoanaMutare
-     ?r <- (mutarePosibila ?c ?l)
-     =>
-     (if (= ?c 1)  ;daca piesa este pe coloana a
-     then
-          (assert (posibilaMutare a ?l))
-          (retract ?r)
-     else
-          (if (= ?c 2)
-          then
-               (assert (posibilaMutare b ?l))
-               (retract ?r)
-          else
-               (if (= ?c 3)
-               then
-                    (assert (posibilaMutare c ?l))
-                    (retract ?r)
-               else
-                    (if (= ?c 4)
-                    then
-                         (assert (posibilaMutare d ?l))
-                         (retract ?r)
-                    else
-                         (if (= ?c 5)
-                         then
-                              (assert (posibilaMutare e ?l))
-                              (retract ?r)
-                         else
-                              (if (= ?c 6)
-                              then
-                                   (assert (posibilaMutare f ?l))
-                                   (retract ?r)
-                              else
-                                   (if (= ?c 7)
-                                   then
-                                   (assert (posibilaMutare g ?l))
-                                   (retract ?r)
-                                   else
-                                        (if (= ?c 8)
-                                        then
-                                        (assert (posibilaMutare h ?l))
-                                        (retract ?r)
-                                        )
-                                   )
-                              )
-                         )
-                    )
-               )
-          )
-     )
-
-
-)

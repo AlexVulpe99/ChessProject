@@ -113,16 +113,78 @@ for i in range(8):
             env.assert_string("(white " + map_from_number_to_char[j]+ " " + str(i+1) + ")")
             board.addpiece("piece " + str(i)+str(j), b_white, abs(7-i), j)
         
-#env.assert_string("(piesa N b 1)")
+#env.assert_string("(piesa P f 2)")
 #env.assert_string("(piesa P a 2)")
-#env.assert_string("(piesa R a 1)")
-env.assert_string("(piesa P d 2)")
+#env.assert_string("(piesa R f 1)")
+#env.assert_string("(piesa K g 1)")
+#env.assert_string("(piesa N c 3)")
+#env.assert_string("(piesa Q g 7)")
+env.assert_string("(piesa B c 4)")
+
+env.run()
+
+rule1 = """
+;regula pentru transformare coloana int -> string
+(defrule ColoanaMutare
+     ?r <- (mutarePosibila ?c ?l)
+     =>
+     (if (= ?c 1)  ;daca piesa este pe coloana a
+     then
+          (assert (posibilaMutare a ?l))
+          (retract ?r)
+     else
+          (if (= ?c 2)
+          then
+               (assert (posibilaMutare b ?l))
+               (retract ?r)
+          else
+               (if (= ?c 3)
+               then
+                    (assert (posibilaMutare c ?l))
+                    (retract ?r)
+               else
+                    (if (= ?c 4)
+                    then
+                         (assert (posibilaMutare d ?l))
+                         (retract ?r)
+                    else
+                         (if (= ?c 5)
+                         then
+                              (assert (posibilaMutare e ?l))
+                              (retract ?r)
+                         else
+                              (if (= ?c 6)
+                              then
+                                   (assert (posibilaMutare f ?l))
+                                   (retract ?r)
+                              else
+                                   (if (= ?c 7)
+                                   then
+                                   (assert (posibilaMutare g ?l))
+                                   (retract ?r)
+                                   else
+                                        (if (= ?c 8)
+                                        then
+                                        (assert (posibilaMutare h ?l))
+                                        (retract ?r)
+                                        )
+                                   )
+                              )
+                         )
+                    )
+               )
+          )
+     )
+)
+"""
+
+env.build(rule1)
+
 env.run()
 
 for fact in env.facts():
     if fact.template == env.find_template("posibilaMutare"):
         print(fact)
-
 
 root.mainloop()
 
