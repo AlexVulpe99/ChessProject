@@ -113,13 +113,13 @@ for i in range(8):
             env.assert_string("(white " + map_from_number_to_char[j]+ " " + str(i+1) + ")")
             board.addpiece("piece " + str(i)+str(j), b_white, abs(7-i), j)
         
-#env.assert_string("(piesa P f 2)")
+env.assert_string("(piesa P f 2)")
 #env.assert_string("(piesa P a 2)")
 #env.assert_string("(piesa R f 1)")
 #env.assert_string("(piesa K g 1)")
 #env.assert_string("(piesa N c 3)")
 #env.assert_string("(piesa Q g 7)")
-env.assert_string("(piesa B c 4)")
+#env.assert_string("(piesa B c 4)")
 
 env.run()
 
